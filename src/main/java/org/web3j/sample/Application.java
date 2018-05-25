@@ -17,6 +17,7 @@ import org.web3j.sample.contracts.generated.Texas;
 import org.web3j.tx.Contract;
 import org.web3j.tx.ManagedTransaction;
 import org.web3j.tx.Transfer;
+import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
@@ -90,8 +91,9 @@ public class Application {
 		// Texas contract = Texas.deploy(web3j, credentials,
 		// ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT).send();
 		String contractAddress = "0x35441adabc362a0081c78c26f431821db654db98";
-		Texas contract = Texas.load(contractAddress, web3j, credentials, ManagedTransaction.GAS_PRICE,
-				Contract.GAS_LIMIT);
+
+		Texas contract = Texas.load(contractAddress, web3j, credentials, DefaultGasProvider.GAS_PRICE,
+				DefaultGasProvider.GAS_LIMIT);
 		// 获取合约地址
 		String texasAddress = contract.getContractAddress();
 		log.info("Smart contract loaded 获取合约地址：" + texasAddress);
