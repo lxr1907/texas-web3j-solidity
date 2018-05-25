@@ -87,23 +87,27 @@ public class Application {
 		// Now lets deploy a smart contract
 		log.info("Deploying smart contract 创建合约");
 		// 创建合约
-		Texas contract = Texas.deploy(web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT).send();
-
+		// Texas contract = Texas.deploy(web3j, credentials,
+		// ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT).send();
+		String contractAddress = "0x35441adabc362a0081c78c26f431821db654db98";
+		Texas contract = Texas.load(contractAddress, web3j, credentials, ManagedTransaction.GAS_PRICE,
+				Contract.GAS_LIMIT);
 		// 获取合约地址
 		String texasAddress = contract.getContractAddress();
-		log.info("Smart contract deployed to address 获取合约地址：" + texasAddress);
+		log.info("Smart contract loaded 获取合约地址：" + texasAddress);
 		log.info("View contract at https://ropsten.etherscan.io/address/" + texasAddress);
 
 		BigInteger canWithdraw = contract.canWhithdraw(account3).send();
 		log.info("canWithdraw:" + canWithdraw);
 		TransactionReceipt transferReceipt = Transfer
-				.sendFunds(web3j, credentials, texasAddress, new BigDecimal(0.01), Convert.Unit.ETHER).send();
+				.sendFunds(web3j, credentials, texasAddress, new BigDecimal(10000000000000000l), Convert.Unit.WEI)
+				.send();
 		canWithdraw = contract.canWhithdraw(account3).send();
 		log.info("canWithdraw:" + canWithdraw);
 		log.info("Transaction complete, view it at https://ropsten.etherscan.io/tx/"
 				+ transferReceipt.getTransactionHash());
 
-		TransactionReceipt transferReceipt2=	contract.bonusTransfer(account3, account2,
+		TransactionReceipt transferReceipt2 = contract.bonusTransfer(account3, account2,
 				Convert.toWei(new BigDecimal(0.01), Convert.Unit.ETHER).toBigInteger()).send();
 		// 监听事件
 		for (Texas.TransferEventResponse event : contract.getTransferEvents(transferReceipt)) {
