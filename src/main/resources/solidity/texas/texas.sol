@@ -15,42 +15,42 @@ contract owned {
 contract TexasContract is owned{
     //18 decimals 1ETH=10^18 wei
     uint8 constant decimals = 18;
-    //ºÏÔ¼ÓµÓĞÕß
+    //åˆçº¦æ‹¥æœ‰è€…
     address owner;
-    //ËùÓĞÕß½±Àø
+    //æ‰€æœ‰è€…å¥–åŠ±
     uint256 ownerFee;
-    //ËùÓĞÕß½±Àø±ÈÀıÇ§·ÖÖ®50,¼È5%
+    //æ‰€æœ‰è€…å¥–åŠ±æ¯”ä¾‹åƒåˆ†ä¹‹50,æ—¢5%
     uint256 ownerFeeRate=50;
-    //0.01¸öETH×îĞ¡³äÖµ
+    //0.01ä¸ªETHæœ€å°å……å€¼
     uint256 minBet=(10**uint256(decimals))/100;
-    //0.1¸öETH×î´ó³äÖµ
+    //0.1ä¸ªETHæœ€å¤§å……å€¼
     uint256 maxBet=(10**uint256(decimals))/10;
     
-    // ÔÚÇø¿éÁ´ÉÏ´´½¨Ò»¸ö¹«¹²ÊÂ¼ş£¬Ëü´¥·¢¾Í»áÍ¨ÖªËùÓĞ¿Í»§¶Ë
+    // åœ¨åŒºå—é“¾ä¸Šåˆ›å»ºä¸€ä¸ªå…¬å…±äº‹ä»¶ï¼Œå®ƒè§¦å‘å°±ä¼šé€šçŸ¥æ‰€æœ‰å®¢æˆ·ç«¯
     event Transfer(address indexed from, address indexed to, uint256 value);
     event TransferError(address indexed from, address indexed to, uint256 value);
     event Bonus(address indexed from, uint256 value);
     event Whithdraw(address indexed from, uint256 value);
     struct player{
-        //½±³Ø
+        //å¥–æ± 
         uint256 bonus;
-        //³äÖµ´ÎÊı
+        //å……å€¼æ¬¡æ•°
         uint256 times;
         //win
         uint256 bonusWin;
     }
-    //´´½¨ËùÓĞÕË»§Óà¶îÊı×é
+    //åˆ›å»ºæ‰€æœ‰è´¦æˆ·ä½™é¢æ•°ç»„
     mapping (address => player) players;
     address[]  playersArray;
     /**
-     * ³õÊ¼»¯ºÏÔ¼
+     * åˆå§‹åŒ–åˆçº¦
      */
     function TexasContract(
     ) public {
-        //³õÊ¼»¯ºÏÔ¼ËùÓĞÈË
+        //åˆå§‹åŒ–åˆçº¦æ‰€æœ‰äºº
         owner=msg.sender;             
     }
-    /// Ê¹ÓÃÒÔÌ«·»»»³ïÂë
+    /// ä½¿ç”¨ä»¥å¤ªåŠæ¢ç­¹ç 
     function () payable public {
         uint amount = msg.value;
         require(amount>=minBet);
@@ -58,23 +58,23 @@ contract TexasContract is owned{
         addToArray(msg.sender);
         players[msg.sender].times+=1;
         players[msg.sender].bonus+=amount;
-        //Í¨Öª
+        //é€šçŸ¥
         Bonus(msg.sender,amount);
        
     }
-    //½«¸ÃµØÖ·¼ÓÈëÊı×é
+    //å°†è¯¥åœ°å€åŠ å…¥æ•°ç»„
     function addToArray(address _player) internal{
-        //Èç¹û²»´æÔÚ£¬½«¸ÃµØÖ·¼ÓÈëÊı×é£¬ÓÃÓÚÒÔºó±éÀú·ÃÎÊ
+        //å¦‚æœä¸å­˜åœ¨ï¼Œå°†è¯¥åœ°å€åŠ å…¥æ•°ç»„ï¼Œç”¨äºä»¥åéå†è®¿é—®
         if(players[msg.sender].times==0){
             playersArray.push(_player);   
         }
     }
-    //¹ÜÀíÔ±¸ù¾İÓÎÏ·½á¹û£¬½«³ïÂë´ÓÒ»¸öÓÃ»§×ªÒÆµ½ÁíÒ»¸ö
+    //ç®¡ç†å‘˜æ ¹æ®æ¸¸æˆç»“æœï¼Œå°†ç­¹ç ä»ä¸€ä¸ªç”¨æˆ·è½¬ç§»åˆ°å¦ä¸€ä¸ª
     function bonusTransfer(address _playerWin,address _playerLose,uint amount) onlyOwner public{
         require(amount>0);
-        //ÊäµÄÍæ¼Ò½ğ¶î×ã¹»
+        //è¾“çš„ç©å®¶é‡‘é¢è¶³å¤Ÿ
         require(players[_playerLose].bonus>=amount);
-        //ÊÖĞø·Ñ
+        //æ‰‹ç»­è´¹
         uint ownerFeePlus=amount/1000*ownerFeeRate;
         ownerFee=ownerFee+ownerFeePlus;
         uint loseOld=players[_playerLose].bonus;
@@ -82,64 +82,80 @@ contract TexasContract is owned{
         players[_playerLose].bonus-=amount;
         players[_playerWin].bonus+=amount-ownerFeePlus;
         if(players[_playerLose].bonus+players[_playerWin].bonus==loseOld+winOld-ownerFeePlus){
-            //³É¹¦Í¨Öª
+            //æˆåŠŸé€šçŸ¥
             Transfer(_playerLose,_playerWin,amount);
         }else{
-            //Ê§°ÜÊı¾İ»ØÍË
+            //å¤±è´¥æ•°æ®å›é€€
             players[_playerLose].bonus=loseOld;
             players[_playerWin].bonus=winOld;
-            //Ê§°ÜÍ¨Öª
+            //å¤±è´¥é€šçŸ¥
             TransferError(_playerLose,_playerWin,amount);
         }
     }
-    //ÓÃ»§½«³ïÂë´ÓÒ»¸öÓÃ»§×ªÒÆµ½ÁíÒ»¸ö
-    function bonusTransfer(address _playerWin,uint amount) public{
-        address _playerLose=msg.sender;
-        require(amount>0);
-        //ÊäµÄÍæ¼Ò½ğ¶î×ã¹»
-        require(players[_playerLose].bonus>=amount);
-        //ÊÖĞø·Ñ
-        uint ownerFeePlus=amount/1000*ownerFeeRate;
-        ownerFee=ownerFee+ownerFeePlus;
-        uint loseOld=players[_playerLose].bonus;
-        uint winOld=players[_playerWin].bonus;
-        players[_playerLose].bonus-=amount;
-        players[_playerWin].bonus+=amount-ownerFeePlus;
-        if(players[_playerLose].bonus+players[_playerWin].bonus==loseOld+winOld-ownerFeePlus){
-            //³É¹¦Í¨Öª
-            Transfer(_playerLose,_playerWin,amount);
-        }else{
-            //Ê§°ÜÊı¾İ»ØÍË
-            players[_playerLose].bonus=loseOld;
-            players[_playerWin].bonus=winOld;
-            //Ê§°ÜÍ¨Öª
-            TransferError(_playerLose,_playerWin,amount);
-        }
-    }
+    // //ç”¨æˆ·å°†ç­¹ç ä»ä¸€ä¸ªç”¨æˆ·è½¬ç§»åˆ°å¦ä¸€ä¸ª
+    // function bonusTransfer(address _playerWin,uint amount) public{
+    //     address _playerLose=msg.sender;
+    //     require(amount>0);
+    //     //è¾“çš„ç©å®¶é‡‘é¢è¶³å¤Ÿ
+    //     require(players[_playerLose].bonus>=amount);
+    //     //æ‰‹ç»­è´¹
+    //     uint ownerFeePlus=amount/1000*ownerFeeRate;
+    //     ownerFee=ownerFee+ownerFeePlus;
+    //     uint loseOld=players[_playerLose].bonus;
+    //     uint winOld=players[_playerWin].bonus;
+    //     players[_playerLose].bonus-=amount;
+    //     players[_playerWin].bonus+=amount-ownerFeePlus;
+    //     if(players[_playerLose].bonus+players[_playerWin].bonus==loseOld+winOld-ownerFeePlus){
+    //         //æˆåŠŸé€šçŸ¥
+    //         Transfer(_playerLose,_playerWin,amount);
+    //     }else{
+    //         //å¤±è´¥æ•°æ®å›é€€
+    //         players[_playerLose].bonus=loseOld;
+    //         players[_playerWin].bonus=winOld;
+    //         //å¤±è´¥é€šçŸ¥
+    //         TransferError(_playerLose,_playerWin,amount);
+    //     }
+    // }
+    // /**
+    //  * ç”¨æˆ·æå–ETH
+    //  */
+    // function whithdraw(uint amount)public{
+    //     require(amount<=players[msg.sender].bonus);
+    //     if(amount<=0){
+    //         amount=players[msg.sender].bonus;
+    //     }
+    //     uint _bonus=players[msg.sender].bonus;
+    //     players[msg.sender].bonus=players[msg.sender].bonus-amount;
+    //     if(_bonus==players[msg.sender].bonus+amount){
+    //         msg.sender.transfer(_bonus);
+    //         //æç°é€šçŸ¥
+    //         Whithdraw(msg.sender,amount);
+    //     }
+    // }
     /**
-     * ÓÃ»§ÌáÈ¡ETH
-     */
-    function whithdraw(uint amount)public{
-        require(amount<=players[msg.sender].bonus);
+    * ç®¡ç†å‘˜ç»™ç”¨æˆ·æå–ETH
+    */
+    function whithdraw(address _player,uint amount) onlyOwner public{
+        require(amount<=players[_player].bonus);
         if(amount<=0){
-            amount=players[msg.sender].bonus;
+            amount=players[_player].bonus;
         }
-        uint _bonus=players[msg.sender].bonus;
-        players[msg.sender].bonus=players[msg.sender].bonus-amount;
-        if(_bonus==players[msg.sender].bonus+amount){
+        uint _bonus=players[_player].bonus;
+        players[_player].bonus-=amount;
+        if(_bonus==players[_player].bonus+amount){
             msg.sender.transfer(_bonus);
-            //ÌáÏÖÍ¨Öª
-            Whithdraw(msg.sender,amount);
+            //æç°é€šçŸ¥
+            Whithdraw(_player,amount);
         }
     }
     /**
-     * ÓÃ»§»ñÈ¡¿ÉÌáÏÖ½ğ¶î
+     * ç”¨æˆ·è·å–å¯æç°é‡‘é¢
      */
-    function canWhithdraw() public view returns(uint256 _bonus){
-       _bonus= players[msg.sender].bonus;
+    function canWhithdraw(address _player) public view returns(uint256 _bonus){
+       _bonus= players[_player].bonus;
     }
     /**
-     * ¹ÜÀíÔ±ÌáÈ¡ETHÊÖĞø·Ñ
+     * ç®¡ç†å‘˜æå–ETHæ‰‹ç»­è´¹
      */
     function whithdrawAdmin() onlyOwner public{
         require(this.balance>=ownerFee);
@@ -148,7 +164,7 @@ contract TexasContract is owned{
         owner.transfer(_ownerFee);
     }
     /**
-     * ¹ÜÀíÔ±ÉèÖÃÊÖĞø·ÑÇ§·ÖÂÊ
+     * ç®¡ç†å‘˜è®¾ç½®æ‰‹ç»­è´¹åƒåˆ†ç‡
      */
     function setRate(uint rate) onlyOwner public {
         ownerFeeRate=rate;
